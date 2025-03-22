@@ -3,12 +3,12 @@ FROM python:3.11.4-alpine
 WORKDIR /usr/src/app
 
 # Copy Necessary Files
-COPY Code_Market/ Code_Market/
+COPY That_1/ That_1/
 COPY Django_Img/ Django_Img/
 
 # Install Dependencies
 RUN pip install --upgrade pip
-RUN pip install -r Code_Market/requirements.txt
+RUN pip install -r That_1/requirements.txt
 
 # Set Environment Variables
 # prevent Python from writing .pyc files

@@ -1,5 +1,5 @@
 #!/bin/sh
-cd Code_Market/
+cd That_1/
 
 export $(grep -v '^#' .env | xargs)
 # rm .env
