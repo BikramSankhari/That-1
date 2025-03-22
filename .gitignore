@@ -1,0 +1,12 @@
+venv/
+
+# Django stuff:
+*.log
+db.sqlite3
+
+# Secrets & Environment Variables
+.env
+*.pem
+
+# Migrations (optional, if you want to track them manually)
+__pycache__/
