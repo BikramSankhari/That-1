@@ -8,3 +8,13 @@ services:
       - ./:/usr/src/app/
     ports:
       - 8000:8000
+
+  gunicorn:
+    container_name: gunicorn
+    build:
+      context: .
+      dockerfile: Gunicorn_Img/Dockerfile
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - 8100:8000

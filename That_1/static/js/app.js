@@ -633,18 +633,18 @@
     };
 
     // Show Newsletter Modal
-    RESHOP.showNewsletterModal = function() {
-        if ($('#newsletter-modal').length) {
-            setTimeout(function () {
-                // Manually opens a modal
-                $('#newsletter-modal').modal({
-                    backdrop: 'static',
-                    keyboard: false,
-                    show: true
-                });
-            }, 5000);
-        }
-    };
+    // RESHOP.showNewsletterModal = function() {
+    //     if ($('#newsletter-modal').length) {
+    //         setTimeout(function () {
+    //             // Manually opens a modal
+    //             $('#newsletter-modal').modal({
+    //                 backdrop: 'static',
+    //                 keyboard: false,
+    //                 show: true
+    //             });
+    //         }, 5000);
+    //     }
+    // };
 
     // Check everything including DOM elements and images loaded
     $(window).on('load',function () {
