@@ -10,6 +10,7 @@ COPY Gunicorn_Img/ Gunicorn_Img/
 RUN pip install --upgrade pip
 RUN pip install -r That_1/requirements.txt
 RUN pip install gunicorn
+RUN apk add dos2unix && dos2unix Gunicorn_Img/entrypoint.sh
 
 # Set Environment Variables
 # prevent Python from writing .pyc files
