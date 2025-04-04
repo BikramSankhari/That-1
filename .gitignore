@@ -1,5 +1,6 @@
 venv/
 
+logo.docx
 # Django stuff:
 *.log
 db.sqlite3

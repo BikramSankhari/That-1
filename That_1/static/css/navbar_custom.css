@@ -1,0 +1,166 @@
+/* Minimum Size Window Settings */
+:root {
+    --sidebar-width: 70%;
+}
+
+.header--style-1 {
+    padding: 5px;
+}
+
+.primary-nav .container {
+    display: flex;
+    width: calc(100% - var(--sidebar-width));
+}
+
+#navigation3 {
+    width: 100%;
+}
+
+.search-div {
+    width: 80%;
+    margin: auto;
+}
+
+.primary-nav .container {
+    padding: 0px;
+}
+
+.primary-nav .secondary-nav-wrapper {
+    display: flex;
+    width: var(--sidebar-width);
+    align-items: flex-end;
+}
+
+.secondary-nav-wrapper .container {
+    width: 158px;
+    margin-right: 0px;
+
+}
+
+.ah-list--design1>li>a,
+.ah-list--design2>li>a {
+    font-weight: normal;
+    font-size: 14px;
+}
+
+/* Window Size specific Settings */
+@media (min-width: 420px) {
+    :root {
+        --sidebar-width: 75%;
+    }
+}
+
+@media (min-width: 465px) {
+    :root {
+        --sidebar-width: 80%;
+    }
+
+    .search-div {
+        width: 70%;
+    }
+}
+
+@media (min-width: 600px) {
+    :root {
+        --sidebar-width: 85%;
+    }
+}
+
+@media (min-width: 780px) {
+    :root {
+        --sidebar-width: 87%;
+    }
+
+    .search-div {
+        width: 60%;
+    }
+}
+
+@media (min-width: 910px) {
+    :root {
+        --sidebar-width: 88%;
+    }
+
+    .search-div {
+        width: 55%;
+    }
+}
+
+@media (min-width: 970px) {
+    :root {
+        --sidebar-width: 89%;
+    }
+
+    .search-div {
+        width: 50%;
+    }
+}
+
+@media (min-width: 1300px) {
+    .search-div {
+        width: 40%;
+    }
+}
+
+@media (min-width: 1500px) {
+    :root {
+        --sidebar-width: 91%;
+    }
+}
+
+@media (min-width: 1900px) {
+    :root {
+        --sidebar-width: 92%;
+    }
+}
+
+@media (max-width: 700PX) {
+    /* .mini-cart-shop-link>.total-item-round {
+        top: 5px;
+        left: 38px;
+    }
+
+    .toggle-button-shop+.total-item-round {
+        top: 5px;
+        right: 10px;
+    } */
+
+    .has-dropdown>.mini-cart {
+        width: 100% !important;
+        box-shadow: none;
+        transition: none;
+        padding: 14px;
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        display: none;
+    }
+
+    .mini-product-container {
+        max-height: 836px;
+    }
+
+    .card-mini-product {
+        display: block;
+        text-align: center;
+    }
+
+    .mini-product {
+        display: block;
+    }
+
+    .mini-product__image-wrapper {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .mini-product__info-wrapper {
+        padding: 0;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .mini-total {
+        margin-bottom: 22px;
+    }
+}
