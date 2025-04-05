@@ -43,6 +43,13 @@
     font-size: 14px;
 }
 
+#app {
+    position: fixed;
+    width: 100%;
+    z-index: 1;
+    box-shadow: 0 4px 8px #808080;
+}
+
 /* Window Size specific Settings */
 @media (min-width: 420px) {
     :root {
