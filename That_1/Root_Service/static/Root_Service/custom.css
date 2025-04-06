@@ -1,0 +1,183 @@
+.content-span-1 {
+    color: #d2042d;
+    font-size: 20pt;
+}
+
+.here-find {
+    font-size: 15pt;
+}
+
+.that1 {
+    font-size: 25pt;
+    color: #d2042d;
+    font-family: "Playfair Display", serif;
+}
+
+.start-explore {
+    background-color: #d2042d;
+    font-style: normal;
+    text-decoration: none;
+}
+
+.shop-now-link {
+    transition: 0.3s;
+    font-size: 5pt;
+    padding: 10px 20px 10px 20px;
+}
+
+.app-content {
+    padding-top: 100px;
+}
+
+.main-div {
+    display: flex;
+}
+
+.left-div {
+    width: 50%;
+}
+
+.right-div {
+    width: 50%;
+}
+
+.hero-slide {
+    height: 350px !important;
+}
+
+/* Windows size specific settings */
+@media (min-width: 300px) {
+    .content-span-1 {
+        font-size: 25pt;
+    }
+}
+
+@media (min-width: 350px) {
+    .content-span-1 {
+        font-size: 28pt;
+    }
+}
+
+@media (min-width: 430px) {
+    .hero-slide {
+        height: 400px !important;
+    }
+
+    .content-span-1 {
+        font-size: 30pt;
+    }
+}
+
+@media (min-width: 500px) {
+    .content-span-1 {
+        font-size: 35pt;
+    }
+
+    .here-find {
+        font-size: 20pt;
+    }
+
+    .that1 {
+        font-size: 40pt;
+    }
+
+    .shop-now-link {
+        font-size: 8pt;
+    }
+
+    .shop-now-link:hover {
+        font-size: 9pt;
+    }
+}
+
+@media (min-width: 600px) {
+    .hero-slide {
+        height: 500px !important;
+    }
+
+    .content-span-1 {
+        font-size: 40pt;
+    }
+
+    .here-find {
+        font-size: 30pt;
+    }
+
+    .that1 {
+        font-size: 45pt;
+    }
+
+    .shop-now-link {
+        font-size: 10pt;
+    }
+
+    .shop-now-link:hover {
+        font-size: 12pt;
+    }
+}
+
+@media (min-width: 768px) {
+    .hero-slide {
+        height: 550px !important;
+    }
+
+    .content-span-1 {
+        font-size: 45pt;
+    }
+
+
+    .that1 {
+        font-size: 50pt;
+    }
+
+    .shop-now-link {
+        font-size: 9pt;
+    }
+
+    .shop-now-link:hover {
+        font-size: 10pt;
+    }
+}
+
+@media (min-width: 768px) {
+       .content-span-1 {
+        font-size: 50pt;
+    }
+
+}
+
+@media (min-width: 1000px) {
+    .hero-slide {
+        height: 650px !important;
+    }
+
+    .content-span-1 {
+        font-size: 60pt;
+    }
+
+    .here-find {
+        font-size: 40pt;
+    }
+
+    .that1 {
+        font-size: 70pt;
+    }
+
+    .shop-now-link {
+        font-size: 9pt;
+    }
+
+    .shop-now-link:hover {
+        font-size: 12pt;
+    }
+
+    .col-12 {
+        margin-top: 130px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .hero-slide {
+        height: 800px !important;
+    }
+}

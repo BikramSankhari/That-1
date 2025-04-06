@@ -46,7 +46,7 @@
 #app {
     position: fixed;
     width: 100%;
-    z-index: 1;
+    z-index: 5;
     box-shadow: 0 4px 8px #808080;
 }
 
@@ -65,41 +65,80 @@
     .search-div {
         width: 70%;
     }
+
+    .secondary-nav-wrapper .container {
+        margin-right: 10px;
+    }
 }
 
 @media (min-width: 600px) {
     :root {
-        --sidebar-width: 85%;
+        --sidebar-width: 80%;
+    }
+
+    .main-logo img {
+        width: 80%;
+        margin-left: 10px;
+    }
+
+    .secondary-nav-wrapper .container {
+        margin-right: 20px;
     }
 }
 
 @media (min-width: 780px) {
     :root {
-        --sidebar-width: 87%;
+        --sidebar-width: 85%;
     }
 
     .search-div {
         width: 60%;
     }
+
+    .main-logo img {
+        width: 90%;
+        margin-left: 20px;
+    }
+
+    .secondary-nav-wrapper .container {
+        margin-right: 30px;
+    }
 }
 
 @media (min-width: 910px) {
     :root {
-        --sidebar-width: 88%;
+        --sidebar-width: 87%;
     }
 
     .search-div {
         width: 55%;
     }
+
+    .main-logo img {
+        width: 100%;
+        margin-left: 30px;
+    }
+
+    .secondary-nav-wrapper .container {
+        margin-right: 40px;
+    }
 }
 
 @media (min-width: 970px) {
     :root {
-        --sidebar-width: 89%;
+        --sidebar-width: 88%;
     }
 
     .search-div {
         width: 50%;
+    }
+
+    .main-logo img {
+        margin-left: 50px;
+    }
+
+    .secondary-nav-wrapper .container {
+        margin-right: 50px;
     }
 }
 
