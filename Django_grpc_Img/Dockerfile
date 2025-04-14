@@ -16,4 +16,4 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # ensure Python output is sent directly to the terminal without buffering
 ENV PYTHONUNBUFFERED=1
 
-ENTRYPOINT ["./Django_Img/entrypoint.sh"]
+ENTRYPOINT ["./Django_grpc_Img/entrypoint.sh"]

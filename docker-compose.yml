@@ -8,3 +8,13 @@ services:
       - ./:/usr/src/app/
     ports:
       - 8000:8000
+
+  django_grpc:
+    container_name: django_grpc
+    build:
+      context: .
+      dockerfile: Django_grpc_Img/Dockerfile
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - 50051:50051
