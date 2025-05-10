@@ -1,9 +1,14 @@
-import grpc
-from That_1.Auth.proto import user_pb2, user_pb2_grpc
+def deco(a, b):
+    def wrapper():
+        def inner(*args, **kwargs):
+            print(a)
+            print(b)
 
+        return inner
+    return wrapper
 
-with grpc.insecure_channel('localhost:50051') as channel:
-    stub = user_pb2_grpc.UserControllerStub(channel)
-    print('----- Create -----')
-    response = stub.Create(user_pb2.UserWithPassword(email="bikram1209@gmail.com", password="pass"))
-    print(response, end='')
+@deco(3, 4)
+def add():
+    print("Added")
+
+add()
