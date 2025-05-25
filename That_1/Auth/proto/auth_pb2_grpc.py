@@ -3,7 +3,8 @@
 import grpc
 import warnings
 
-import auth_pb2 as auth__pb2
+from . import auth_pb2 as auth__pb2
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 GRPC_GENERATED_VERSION = '1.71.0'
 GRPC_VERSION = grpc.__version__
@@ -44,6 +45,11 @@ class AuthStub(object):
                 request_serializer=auth__pb2.SignupRequest.SerializeToString,
                 response_deserializer=auth__pb2.SignupResponse.FromString,
                 _registered_method=True)
+        self.GetBloom = channel.unary_unary(
+                '/Auth.Auth/GetBloom',
+                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                response_deserializer=auth__pb2.BloomResponse.FromString,
+                _registered_method=True)
 
 
 class AuthServicer(object):
@@ -61,6 +67,12 @@ class AuthServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetBloom(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AuthServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -73,6 +85,11 @@ def add_AuthServicer_to_server(servicer, server):
                     servicer.Signup,
                     request_deserializer=auth__pb2.SignupRequest.FromString,
                     response_serializer=auth__pb2.SignupResponse.SerializeToString,
+            ),
+            'GetBloom': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetBloom,
+                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                    response_serializer=auth__pb2.BloomResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -129,6 +146,33 @@ class Auth(object):
             '/Auth.Auth/Signup',
             auth__pb2.SignupRequest.SerializeToString,
             auth__pb2.SignupResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetBloom(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Auth.Auth/GetBloom',
+            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+            auth__pb2.BloomResponse.FromString,
             options,
             channel_credentials,
             insecure,

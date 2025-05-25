@@ -22,23 +22,26 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nauth.proto\x12\x04\x41uth\"\x16\n\x05\x45mail\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"?\n\x07IsValid\x12\x0e\n\x06\x65xists\x18\x01 \x01(\x08\x12\x16\n\tis_active\x18\x02 \x01(\x08H\x00\x88\x01\x01\x42\x0c\n\n_is_active\"F\n\rSignupRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x14\n\x0cis_validated\x18\x03 \x01(\x08\" \n\x0eSignupResponse\x12\x0e\n\x06status\x18\x01 \x01(\t2m\n\x04\x41uth\x12.\n\x0eUniqueValidate\x12\x0b.Auth.Email\x1a\r.Auth.IsValid\"\x00\x12\x35\n\x06Signup\x12\x13.Auth.SignupRequest\x1a\x14.Auth.SignupResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nauth.proto\x12\x04\x41uth\x1a\x1bgoogle/protobuf/empty.proto\"\x16\n\x05\x45mail\x12\r\n\x05\x65mail\x18\x01 \x01(\t\"\x1e\n\rBloomResponse\x12\r\n\x05\x62loom\x18\x01 \x01(\x0c\"?\n\x07IsValid\x12\x0e\n\x06\x65xists\x18\x01 \x01(\x08\x12\x16\n\tis_active\x18\x02 \x01(\x08H\x00\x88\x01\x01\x42\x0c\n\n_is_active\"F\n\rSignupRequest\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x14\n\x0cis_validated\x18\x03 \x01(\x08\" \n\x0eSignupResponse\x12\x0e\n\x06status\x18\x01 \x01(\t2\xa8\x01\n\x04\x41uth\x12.\n\x0eUniqueValidate\x12\x0b.Auth.Email\x1a\r.Auth.IsValid\"\x00\x12\x35\n\x06Signup\x12\x13.Auth.SignupRequest\x1a\x14.Auth.SignupResponse\"\x00\x12\x39\n\x08GetBloom\x12\x16.google.protobuf.Empty\x1a\x13.Auth.BloomResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'auth_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_EMAIL']._serialized_start=20
-  _globals['_EMAIL']._serialized_end=42
-  _globals['_ISVALID']._serialized_start=44
-  _globals['_ISVALID']._serialized_end=107
-  _globals['_SIGNUPREQUEST']._serialized_start=109
-  _globals['_SIGNUPREQUEST']._serialized_end=179
-  _globals['_SIGNUPRESPONSE']._serialized_start=181
-  _globals['_SIGNUPRESPONSE']._serialized_end=213
-  _globals['_AUTH']._serialized_start=215
-  _globals['_AUTH']._serialized_end=324
+  _globals['_EMAIL']._serialized_start=49
+  _globals['_EMAIL']._serialized_end=71
+  _globals['_BLOOMRESPONSE']._serialized_start=73
+  _globals['_BLOOMRESPONSE']._serialized_end=103
+  _globals['_ISVALID']._serialized_start=105
+  _globals['_ISVALID']._serialized_end=168
+  _globals['_SIGNUPREQUEST']._serialized_start=170
+  _globals['_SIGNUPREQUEST']._serialized_end=240
+  _globals['_SIGNUPRESPONSE']._serialized_start=242
+  _globals['_SIGNUPRESPONSE']._serialized_end=274
+  _globals['_AUTH']._serialized_start=277
+  _globals['_AUTH']._serialized_end=445
 # @@protoc_insertion_point(module_scope)

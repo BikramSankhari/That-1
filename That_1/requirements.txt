@@ -6,7 +6,9 @@ grpcio==1.71.0
 grpcio-tools==1.71.0
 mmh3==5.1.0
 protobuf==5.29.4
+Pympler==1.1
+pywin32==310
 setuptools==79.0.1
 sqlparse==0.5.3
 tzdata==2025.2
-pylibmc==1.6.3
+zstd==1.5.7.0

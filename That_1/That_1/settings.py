@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_grpc_framework',
 ]
 
 # Dynamically Discover Modules
@@ -138,7 +137,7 @@ AUTH_USER_MODEL = 'Auth.User'
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.memcached.PyLibMCCache",
-        "LOCATION": "memcache",
+        "LOCATION": os.environ.get('MEMCACHED_LOCATION'),
         "TIMEOUT": None,
         "OPTIONS": {
             'binary': True,

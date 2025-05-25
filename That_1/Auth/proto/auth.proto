@@ -2,13 +2,20 @@ syntax = "proto3";
 
 package Auth;
 
+import "google/protobuf/empty.proto";
+
 service Auth {
     rpc UniqueValidate(Email) returns(IsValid) {};
     rpc Signup(SignupRequest) returns (SignupResponse) {};
+    rpc GetBloom(google.protobuf.Empty) returns (BloomResponse) {};
 }
 
 message Email{
     string email = 1;
+}
+
+message BloomResponse {
+    bytes bloom = 1;
 }
 
 message IsValid{
