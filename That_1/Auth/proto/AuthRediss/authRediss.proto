@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package AuthRediss;
+
+import "google/protobuf/empty.proto";
+
+service AuthRediss {
+    rpc GetBloomFromRediss(google.protobuf.Empty) returns (BloomResponseFromRediss) {};
+}
+
+message BloomResponseFromRediss {
+    bytes bloom = 1;
+}

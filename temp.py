@@ -1,14 +1,7 @@
-def deco(a, b):
-    def wrapper():
-        def inner(*args, **kwargs):
-            print(a)
-            print(b)
+try:
+    4/1
+except ZeroDivisionError as e:
+    a = 2
 
-        return inner
-    return wrapper
-
-@deco(3, 4)
-def add():
-    print("Added")
-
-add()
+if a:
+    print("a is true")

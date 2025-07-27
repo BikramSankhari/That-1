@@ -45,10 +45,10 @@ class AuthStub(object):
                 request_serializer=auth__pb2.SignupRequest.SerializeToString,
                 response_deserializer=auth__pb2.SignupResponse.FromString,
                 _registered_method=True)
-        self.GetBloom = channel.unary_unary(
-                '/Auth.Auth/GetBloom',
+        self.GetBloomFromPeer = channel.unary_unary(
+                '/Auth.Auth/GetBloomFromPeer',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=auth__pb2.BloomResponse.FromString,
+                response_deserializer=auth__pb2.BloomResponseFromPeer.FromString,
                 _registered_method=True)
 
 
@@ -67,7 +67,7 @@ class AuthServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetBloom(self, request, context):
+    def GetBloomFromPeer(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -86,10 +86,10 @@ def add_AuthServicer_to_server(servicer, server):
                     request_deserializer=auth__pb2.SignupRequest.FromString,
                     response_serializer=auth__pb2.SignupResponse.SerializeToString,
             ),
-            'GetBloom': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetBloom,
+            'GetBloomFromPeer': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetBloomFromPeer,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=auth__pb2.BloomResponse.SerializeToString,
+                    response_serializer=auth__pb2.BloomResponseFromPeer.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -157,7 +157,7 @@ class Auth(object):
             _registered_method=True)
 
     @staticmethod
-    def GetBloom(request,
+    def GetBloomFromPeer(request,
             target,
             options=(),
             channel_credentials=None,
@@ -170,9 +170,9 @@ class Auth(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Auth.Auth/GetBloom',
+            '/Auth.Auth/GetBloomFromPeer',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            auth__pb2.BloomResponse.FromString,
+            auth__pb2.BloomResponseFromPeer.FromString,
             options,
             channel_credentials,
             insecure,

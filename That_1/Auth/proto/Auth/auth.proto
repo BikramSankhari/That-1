@@ -7,14 +7,14 @@ import "google/protobuf/empty.proto";
 service Auth {
     rpc UniqueValidate(Email) returns(IsValid) {};
     rpc Signup(SignupRequest) returns (SignupResponse) {};
-    rpc GetBloom(google.protobuf.Empty) returns (BloomResponse) {};
+    rpc GetBloomFromPeer(google.protobuf.Empty) returns (BloomResponseFromPeer) {};
 }
 
 message Email{
     string email = 1;
 }
 
-message BloomResponse {
+message BloomResponseFromPeer {
     bytes bloom = 1;
 }
 

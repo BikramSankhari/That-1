@@ -2,8 +2,9 @@ venv/
 
 # Custom Files
 logo.docx
-commands.md
 temp.py
+commands.md
+secrets/
 
 # Django stuff:
 *.log

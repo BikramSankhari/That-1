@@ -135,7 +135,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'Auth.User'
 
 CACHES = {
-    "default": {
+    Configurations.MEMCACHED_ALIAS: {
         "BACKEND": "django.core.cache.backends.memcached.PyLibMCCache",
         "LOCATION": os.environ.get('MEMCACHED_LOCATION'),
         "TIMEOUT": None,
