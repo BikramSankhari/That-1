@@ -6,4 +6,4 @@ class AuthConfig(AppConfig):
     name = 'Auth'
 
     def ready(self):
-       pass
+        pass

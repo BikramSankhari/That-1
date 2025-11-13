@@ -11,9 +11,10 @@ from That_1.utils import exponential_backoff_retry
 from zstd import ZSTD_uncompress as decompress
 from google.protobuf import empty_pb2
 from pympler.asizeof import asizeof
-from .services import memcached
+from .utils import memcached
 from . import configurations
 
+# This variable is set during app start in apps.py and then imported by services.py
 bloom = None
 
 ROOT_CERTIFICATE_PATH = os.environ["ROOT_CERTIFICATE_PATH"]

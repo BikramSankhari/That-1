@@ -1,7 +1,5 @@
-import socket
 import os
-import grpc
-import pylibmc  # type: ignore
+import grpc.aio
 from .bloom_manager import bloomfilter
 from django.contrib.auth import get_user_model
 from proto.Auth.auth_pb2 import IsValid, BloomResponseFromPeer
@@ -9,25 +7,20 @@ from django.db.utils import IntegrityError
 from proto.Auth.auth_pb2_grpc import AuthServicer
 from django.db import OperationalError, InterfaceError
 from . import configurations
-from That_1.utils import exponential_backoff_retry, CacheInteractor
-from That_1.Configurations import MEMCACHED_ALIAS
+from That_1.utils import exponential_backoff_retry
 from bloom_manager import bloom
 from zstd import ZSTD_compress as compress
 from datetime import datetime
+from .utils import memcached
 
-MEMCACHED_EXCEPTIONS = (pylibmc.Error, socket.timeout, socket.error)
 
 User = get_user_model()
-bloom = bloomfilter(error_rate=0.001, element_num=configurations.BLOOM_SIZE)
-memcached = CacheInteractor(alias_name=MEMCACHED_ALIAS, exceptions=MEMCACHED_EXCEPTIONS,
-                            base_backoff=configurations.BASE_MEMCACHED_BACKOFF,
-                            max_retries=configurations.MAX_MEMCACHED_RETRIES)
 
+DB_ERRORS = (OperationalError, InterfaceError)
 
 @exponential_backoff_retry(base_backoff=configurations.BASE_DB_BACKOFF,
                            max_retries=configurations.MAX_DB_RETRIES,
-                           exceptions=(OperationalError, InterfaceError))
-
+                           exceptions=DB_ERRORS)
 def get_user_status_from_db(email):
     # The query returns None if the object is not found
     return User.objects.filter(email=email).values_list('is_active', flat=True).first()
@@ -47,8 +40,8 @@ class AuthService(AuthServicer):
         Skipped to avoid memory bloat; reconsider if read load becomes a bottleneck depending on the specific business scenario.
         '''
 
-        # Check the Cache
-        email_active_status = memcached.get(email)
+        # Check the Cache asynchronously
+        email_active_status = await memcached.async_get(email)
 
         if email_active_status is not None:
             return IsValid(exists=True, is_active=email_active_status)
@@ -56,7 +49,7 @@ class AuthService(AuthServicer):
         # Fallback to DB
         try:
             email_active_status = get_user_status_from_db(email)
-        except (OperationalError, InterfaceError) as e:
+        except DB_ERRORS as e:
             # Log the error here
             email_active_status = None
 
@@ -68,7 +61,7 @@ class AuthService(AuthServicer):
 
         return IsValid(exists=True, is_active=email_active_status)
 
-    def GetBloomFromPeer(self, request, context):
+    async def GetBloomFromPeer(self, request, context):
 
         # Check the local memcached for a pre compressed bloom
         '''
@@ -115,13 +108,13 @@ class AuthService(AuthServicer):
 
         except MemoryError:
             '''Can log the error here'''
-            abort = lambda: context.abort(grpc.StatusCode.RESOURCE_EXHAUSTED,
-                                "Memory exhausted during Bloom filter compression")
+            def abort(): return context.abort(grpc.StatusCode.RESOURCE_EXHAUSTED,
+                                              "Memory exhausted during Bloom filter compression")
 
         except Exception as e:
             '''Can log the error here'''
-            abort = lambda: context.abort(grpc.StatusCode.INTERNAL,
-                                f"Internal error: {str(e)}")
+            def abort(): return context.abort(grpc.StatusCode.INTERNAL,
+                                              f"Internal error: {str(e)}")
 
         else:
             # Set the compressed bloom in cache for 1 minute
@@ -129,7 +122,7 @@ class AuthService(AuthServicer):
                 key=configurations.MEMCACHED_COMPRESSED_BLOOM_KEY,
                 value=compressed_bloom,
                 timeout=configurations.COMPRESSED_BLOOM_TTL)
-            
+
             abort = None
 
         finally:
