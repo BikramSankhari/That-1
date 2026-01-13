@@ -1,6 +1,6 @@
+import asyncio
 import os
 import grpc.aio
-from .bloom_manager import bloomfilter
 from django.contrib.auth import get_user_model
 from proto.Auth.auth_pb2 import IsValid, BloomResponseFromPeer
 from django.db.utils import IntegrityError
@@ -8,15 +8,16 @@ from proto.Auth.auth_pb2_grpc import AuthServicer
 from django.db import OperationalError, InterfaceError
 from . import configurations
 from That_1.utils import exponential_backoff_retry
-from bloom_manager import bloom
+from .bloom_manager import bloom
 from zstd import ZSTD_compress as compress
 from datetime import datetime
-from .utils import memcached
+from .utils import async_memcached
 
 
 User = get_user_model()
 
 DB_ERRORS = (OperationalError, InterfaceError)
+
 
 @exponential_backoff_retry(base_backoff=configurations.BASE_DB_BACKOFF,
                            max_retries=configurations.MAX_DB_RETRIES,
@@ -41,7 +42,7 @@ class AuthService(AuthServicer):
         '''
 
         # Check the Cache asynchronously
-        email_active_status = await memcached.async_get(email)
+        email_active_status = await async_memcached.async_get(email)
 
         if email_active_status is not None:
             return IsValid(exists=True, is_active=email_active_status)
@@ -57,7 +58,7 @@ class AuthService(AuthServicer):
             return IsValid(exists=False)
 
         # Update Cache if the email exists in DB
-        memcached.retry_set(key=email, value=email_active_status)
+        async_memcached.set(key=email, value=email_active_status, retry=True, suppress=True)
 
         return IsValid(exists=True, is_active=email_active_status)
 
@@ -72,21 +73,25 @@ class AuthService(AuthServicer):
         node name , passing it over the network (as the request will come through a service) and then
         comparing against an environment variable will be even more than just a double check on same node
         '''
-        compressed_bloom = memcached.get(
-            configurations.MEMCACHED_COMPRESSED_BLOOM_KEY)
+        compressed_bloom = None
+        already_compressing = False
 
-        if compressed_bloom is not None:
+        compressed_bloom, already_compressing = await async_memcached.multi_get(
+            [configurations.MEMCACHED_COMPRESSED_BLOOM_KEY, configurations.BLOOM_COMPRESSION_LOCK_KEY],
+            suppress=True)
+
+        if compressed_bloom:
             return BloomResponseFromPeer(bloom=compressed_bloom)
 
-        bloom_compression_lock_key = "bloom_compression_lock"
 
         # If compressed bloom is not in cache then check if some other pod is already compressing the bloom
-        already_compressing = memcached.get(bloom_compression_lock_key)
-
         if already_compressing:
-            compressed_bloom = memcached.retry_get(configurations.MEMCACHED_COMPRESSED_BLOOM_KEY,
-                                                   base_backoff=configurations.BASE_MEMCACHED_ALREADY_COMPRESSING_BACKOFF,
-                                                   max_retries=configurations.MAX_MEMCACHED_ALREADY_COMPRESSING_RETRIES)
+            retries = 0
+            while compressed_bloom is None and retries < configurations.MAX_MEMCACHED_ALREADY_COMPRESSING_RETRIES:
+                await asyncio.sleep(configurations.BASE_MEMCACHED_ALREADY_COMPRESSING_BACKOFF)
+                retries += 1
+                compressed_bloom = await async_memcached.get(
+                    configurations.MEMCACHED_COMPRESSED_BLOOM_KEY,)
 
             if compressed_bloom is not None:
                 return BloomResponseFromPeer(bloom=compressed_bloom)
@@ -96,10 +101,13 @@ class AuthService(AuthServicer):
         pod_id = os.environ.get("HOSTNAME", "unknown-pod")
         lock_value = f"{pod_id} :: {timestamp}"
 
-        memcached.retry_set(key=bloom_compression_lock_key, value=lock_value)
+        await async_memcached.set(
+            key=configurations.BLOOM_COMPRESSION_LOCK_KEY, value=lock_value,
+            exptime=configurations.BLOOM_COMPRESSION_LOCK_TTL,
+            retry=True, suppress=True)
 
         try:
-            # If in case the compresion fails then the lock will be released
+            # If in case the compresion fails then the lock will be released in finally block
             '''
             During compression the zstd algorithms takes some extra memory.
             So then it may run out of memory and raise MemoryError. This is just a case.
@@ -108,27 +116,25 @@ class AuthService(AuthServicer):
 
         except MemoryError:
             '''Can log the error here'''
-            def abort(): return context.abort(grpc.StatusCode.RESOURCE_EXHAUSTED,
+            context.abort(grpc.StatusCode.RESOURCE_EXHAUSTED,
                                               "Memory exhausted during Bloom filter compression")
 
         except Exception as e:
             '''Can log the error here'''
-            def abort(): return context.abort(grpc.StatusCode.INTERNAL,
+            context.abort(grpc.StatusCode.INTERNAL,
                                               f"Internal error: {str(e)}")
 
         else:
             # Set the compressed bloom in cache for 1 minute
-            memcached.retry_set(
+            await async_memcached.set(
                 key=configurations.MEMCACHED_COMPRESSED_BLOOM_KEY,
                 value=compressed_bloom,
-                timeout=configurations.COMPRESSED_BLOOM_TTL)
-
-            abort = None
-
+                exptime=configurations.COMPRESSED_BLOOM_TTL,
+                retry=True, suppress=True)
+            
+            return BloomResponseFromPeer(bloom=compressed_bloom)
+        
         finally:
             # Release the lock
-            memcached.delete(bloom_compression_lock_key)
-            if abort:
-                abort()
+            await async_memcached.delete(configurations.BLOOM_COMPRESSION_LOCK_KEY, retry=True, suppress=True)
 
-        return BloomResponseFromPeer(bloom=compressed_bloom)

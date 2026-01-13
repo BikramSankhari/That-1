@@ -6,17 +6,17 @@ from typing import Any, Mapping, Optional, Tuple, Union
 from .custom_pool import CustomPool
 import asyncio
 from .exceptions import ResponseTimeOut
-from That_1.That_1.Configurations import BASE_MEMCACHE_BACKOFF, MAX_MEMCACHE_RETRIES
-from That_1.That_1.utils import exponential_backoff_retry
+from .exponential_backoff_retry import exponential_backoff_retry
+from .Configurations import BASE_MEMCACHE_BACKOFF, MAX_MEMCACHE_RETRIES
 
 class CustomFlagClient(FlagClient):
-    def __init__(self, host: str, port: int = 11211, *,
+    def __init__(self, host: str | None, port: int = 11211, *,
                  pool_size: int = 2, pool_minsize: Optional[int] = None,
                  conn_args: Optional[Mapping[str, Any]] = None,
                  get_flag_handler: Optional[_GetFlagHandler[_T]] = None,
                  set_flag_handler: Optional[_SetFlagHandler[_T]] = None,
                  connection_timeout: float, timeout: float, tcp_keepalive: bool, tcp_nodelay: bool,
-                 base_backoff, max_retries, exceptions):
+                 base_backoff, max_retries, exceptions, unix_socket):
 
         if not pool_minsize:
             pool_minsize = pool_size
@@ -25,7 +25,7 @@ class CustomFlagClient(FlagClient):
         if get_flag_handler is None:
             def get_flag_handler(conn): return conn
         self._pool = CustomPool(
-            host, port, minsize=pool_minsize, maxsize=pool_size,
+            host=host, port=port, unix_socket=unix_socket, minsize=pool_minsize, maxsize=pool_size,
             conn_args=conn_args, connection_timeout=connection_timeout,
             tcp_keepalive=tcp_keepalive, tcp_nodelay=tcp_nodelay)
 
@@ -154,7 +154,7 @@ class CustomFlagClient(FlagClient):
         that the item with this key was not found.
         """
         return await self.run_appropriate_function(retry=retry, suppress=suppress, key=key)
-    
+
     async def flush_all(self, retry=False, suppress=False) -> bool:
         """Flushes all data from the server.
 
@@ -165,12 +165,19 @@ class CustomFlagClient(FlagClient):
 
 # This class takes additional arguments and pass them to CustomFlagClient
 class CustomClient(CustomFlagClient):
-    def __init__(self, host: str, port: int = 11211, *,
-                 pool_size: int = 2, pool_minsize: Optional[int] = None,
+    def __init__(self, host: str | None = None, port: int = 11211, unix_socket: str | None = None,
+                 *, pool_size: int = 2, pool_minsize: Optional[int] = None,
                  conn_args: Optional[Mapping[str, Any]] = None, connection_timeout: float = 5.0,
                  timeout: float = 5.0, tcp_keepalive: bool = True, tcp_nodelay: bool = True,
                  exceptions=(Exception,), base_backoff=BASE_MEMCACHE_BACKOFF, max_retries=MAX_MEMCACHE_RETRIES):
-        super().__init__(host, port, pool_size=pool_size, pool_minsize=pool_minsize,
+
+        if host is None and unix_socket is None:
+            raise ValueError("Either host or unix_socket must be provided")
+        
+        if host is not None and unix_socket is not None:
+            raise ValueError("Only one of host or unix_socket should be provided")
+
+        super().__init__(host=host, port=port, unix_socket=unix_socket, pool_size=pool_size, pool_minsize=pool_minsize,
                          conn_args=conn_args,
                          get_flag_handler=None, set_flag_handler=None,
                          connection_timeout=connection_timeout,

@@ -133,21 +133,3 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Auth.User'
-
-CACHES = {
-    Configurations.MEMCACHED_ALIAS: {
-        "BACKEND": "django.core.cache.backends.memcached.PyLibMCCache",
-        "LOCATION": os.environ.get('MEMCACHED_LOCATION'),
-        "TIMEOUT": None,
-        "OPTIONS": {
-            'binary': True,
-            "behaviors": {
-                "tcp_nodelay": True,
-                "tcp_keepalive": True,
-                "connect_timeout": 100, # 100 miliseconds
-                "send_timeout": 100000, # 100 miliseconds (in microseconds)
-                "receive_timeout": 100000, # 100 miliseconds (in microseconds)
-            }
-        }
-    }
-}

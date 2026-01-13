@@ -14,3 +14,4 @@ setuptools==79.0.1
 sqlparse==0.5.3
 tzdata==2025.2
 zstd==1.5.7.0
+pylibmc==1.6.3

@@ -1,54 +1,39 @@
 import os
-import grpc
-import socket
 import bloompy
-import redis.exceptions
-import zstd
-import redis
-from .proto.Auth import auth_pb2_grpc
-from .proto.AuthRediss import authRediss_pb2_grpc
 from That_1.utils import exponential_backoff_retry
 from zstd import ZSTD_uncompress as decompress
 from google.protobuf import empty_pb2
-from pympler.asizeof import asizeof
-from .utils import memcached
+from .utils import GRPC_EXCEPTIONS, DECOMPRESSION_EXCEPTIONS
 from . import configurations
+from .grpc_clients import get_sync_rediss_stub, close_sync_rediss_stub, get_peer_stub, close_peer_stub
 
-# This variable is set during app start in apps.py and then imported by services.py
+# This variable is set during startup through the initialize_bloom() function in grpc server code
+# and then imported by services.py
 bloom = None
 
-ROOT_CERTIFICATE_PATH = os.environ["ROOT_CERTIFICATE_PATH"]
 
-GRPC_EXCEPTIONS = (
-    grpc.RpcError,
-    TimeoutError,
-    ConnectionError,
-    socket.timeout,
-    ConnectionResetError,
-    OSError
-)
-
-DECOMPRESSION_EXCEPTIONS = (zstd.Error)
+def initialize_bloom():
+    global bloom
+    bloom = BloomFilter(element_num=configurations.BLOOM_SIZE,
+                        error_rate=configurations.BLOOM_ERROR_RATE)
 
 
 class BloomFilter(bloompy.BloomFilter):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):    
         super().__init__(*args, **kwargs)
-
-        self.bloom_size_in_bytes = asizeof(self.bit_array)
 
         # Check for Rediss first
         if self.__load_bloom_from_rediss() is True:
             return
-        
+
         # Check for Memcached
         elif self.__load_bloom_from_memcached() is True:
             return
-        
+
         # Go for peer
         elif self.__load_bloom_from_peer() is True:
             return
-        
+
         # Start with an empty bloom if all fails
         else:
             '''Can log that bloom is starting from scratch'''
@@ -61,12 +46,17 @@ class BloomFilter(bloompy.BloomFilter):
         return self.bit_array.tobytes()
 
     def __load(self, compressed_data):
+
         try:
             current_bloom = decompress(compressed_data)
         except DECOMPRESSION_EXCEPTIONS as e:
             # Can log here
-            raise e
+            return False
         else:
+            if len(current_bloom) != len(self.bit_array.tobytes()):
+                # Can log here
+                return False
+
             self.bit_array.clear()
             self.bit_array.frombytes(current_bloom)
             return True
@@ -75,59 +65,62 @@ class BloomFilter(bloompy.BloomFilter):
 
         @exponential_backoff_retry(base_backoff=configurations.BASE_REDISS_BACKOFF, max_retries=configurations.MAX_REDISS_RETRIES, exceptions=GRPC_EXCEPTIONS)
         def get_compressed_bloom_from_rediss():
-            rediss_address = f"{os.environ.get('REDISS_ENDPOINT')}:{os.environ.get('REDISS_PORT')}"
-            with grpc.insecure_channel(rediss_address) as channel:
-                stub = authRediss_pb2_grpc.AuthRedissStub(channel)
-                response = stub.GetBloomFromRediss(empty_pb2.Empty())
-
+            stub = get_sync_rediss_stub()
+            response = stub.GetBloomFromRediss(empty_pb2.Empty())
             return response.bloom
-        
-        ''' Log that the bloom is being loaded from Rediss '''
 
+        ''' Log that the bloom is being loaded from Rediss '''
         try:
             compressed_bloom = get_compressed_bloom_from_rediss()
         except GRPC_EXCEPTIONS:
             # Can log here
             return False
         else:
-            self.__load(compressed_bloom)
-            return True
-
+            return self.__load(compressed_bloom)
+        finally:
+            close_sync_rediss_stub()
 
     def __load_bloom_from_memcached(self):
-        # Check local Memcached and if there is a network issue then retry
-        ''' Log that the bloom is being loaded from Memcached '''
-        compressed_bloom = memcached.retry_get(
-            configurations.MEMCACHED_COMPRESSED_BLOOM_KEY)
 
-        if compressed_bloom is  None:
+        # Check local Memcached and if there is a network issue then retry
+        @exponential_backoff_retry(base_backoff=configurations.BASE_MEMCACHED_BACKOFF, max_retries=configurations.MAX_MEMCACHED_RETRIES, exceptions=pylibmc.Timeout)
+        def get_compressed_bloom_from_memcached(client: pylibmc.Client):
+            return client.get(configurations.MEMCACHED_COMPRESSED_BLOOM_KEY)
+
+        import pylibmc  # type: ignore
+        client = pylibmc.Client([f"unix:{os.environ.get('MEMCACHED_UNIX_SOCKET')}"],
+                                binary=True,
+                                behaviors={"connect_timeout": int(configurations.MEMCACHED_CONNECTION_TIMEOUT * 1000),
+                                           "send_timeout": configurations.ASYNC_MEMCACHED_SEND_TIMEOUT,
+                                           "receive_timeout": configurations.ASYNC_MEMCACHED_RECV_TIMEOUT, }
+                                )
+
+        ''' Log that the bloom is being loaded from Memcached '''
+        try:
+            compressed_bloom = get_compressed_bloom_from_memcached(client)
+        except Exception:
+            # Log the error here
             return False
-        
         else:
-            try:
-                self.__load(compressed_bloom)
-                return True
-            except DECOMPRESSION_EXCEPTIONS as e:
-                # Can log here
-                return False
+            return self.__load(compressed_bloom)
+        finally:
+            client.disconnect_all()
+
 
     def __load_bloom_from_peer(self):
         ''' Log that the bloom is being loaded from Peer '''
-        @exponential_backoff_retry(base_backoff=0.5, max_retries=5, exceptions=GRPC_EXCEPTIONS)
+        @exponential_backoff_retry(base_backoff=configurations.BASE_PEER_BACKOFF, max_retries=configurations.MAX_PEER_RETRIES, exceptions=GRPC_EXCEPTIONS)
         def get_compressed_bloom_from_peer():
-            # If the compression fails the peer pod will return None. In that case it will try again.
-            grpc_address = f"{os.environ.get('AUTH_BACKEND_SERVICE_NAME')}:{os.environ.get('AUTH_BACKEND_SERVICE_PORT')}"
-            with grpc.insecure_channel(grpc_address) as channel:
-                stub = auth_pb2_grpc.AuthStub(channel)
-                response = stub.GetBloom(empty_pb2.Empty())
-
+            stub = get_peer_stub()
+            response = stub.GetBloomFromPeer(empty_pb2.Empty())
             return response.bloom
-        
+
         try:
             compressed_bloom = get_compressed_bloom_from_peer()
         except GRPC_EXCEPTIONS:
             # Can log here
             return False
         else:
-            self.__load(compressed_bloom)
-            return True
+            return self.__load(compressed_bloom)
+        finally:
+            close_peer_stub()
