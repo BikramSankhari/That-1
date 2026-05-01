@@ -96,6 +96,7 @@ class CustomFlagClient(FlagClient):
         :param retry: ``bool``, whether to retry on exceptions.
         :param suppress: ``bool``, whether to suppress exceptions.
         :return: ``bytes``, is the data for this specified key.
+        :return: ``None`` if the suppress = True and there is an exception
         """
 
         return await self.run_appropriate_function(key, default=default, retry=retry, suppress=suppress)

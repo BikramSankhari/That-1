@@ -18,7 +18,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 import importlib
-from Auth.handlers import grpc_handlers as user_grpc_handlers
 
 
 urlpatterns = [
@@ -31,6 +30,3 @@ for app in settings.INSTALLED_APPS:
         urlpatterns.append(path("", include(f"{app}.urls")))
     except ImportError:
         pass
-
-def grpc_handlers(server):
-    user_grpc_handlers(server)

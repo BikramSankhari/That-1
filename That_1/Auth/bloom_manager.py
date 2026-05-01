@@ -7,15 +7,12 @@ from .utils import GRPC_EXCEPTIONS, DECOMPRESSION_EXCEPTIONS
 from . import configurations
 from .grpc_clients import get_sync_rediss_stub, close_sync_rediss_stub, get_peer_stub, close_peer_stub
 
-# This variable is set during startup through the initialize_bloom() function in grpc server code
-# and then imported by services.py
-bloom = None
-
-
+# This functions initiates the bloom. It is called in server.py and the bloom is passes to the servicer
 def initialize_bloom():
-    global bloom
     bloom = BloomFilter(element_num=configurations.BLOOM_SIZE,
                         error_rate=configurations.BLOOM_ERROR_RATE)
+
+    return bloom
 
 
 class BloomFilter(bloompy.BloomFilter):
@@ -81,13 +78,13 @@ class BloomFilter(bloompy.BloomFilter):
             close_sync_rediss_stub()
 
     def __load_bloom_from_memcached(self):
+        import pylibmc  # type: ignore
 
         # Check local Memcached and if there is a network issue then retry
         @exponential_backoff_retry(base_backoff=configurations.BASE_MEMCACHED_BACKOFF, max_retries=configurations.MAX_MEMCACHED_RETRIES, exceptions=pylibmc.Timeout)
         def get_compressed_bloom_from_memcached(client: pylibmc.Client):
             return client.get(configurations.MEMCACHED_COMPRESSED_BLOOM_KEY)
 
-        import pylibmc  # type: ignore
         client = pylibmc.Client([f"unix:{os.environ.get('MEMCACHED_UNIX_SOCKET')}"],
                                 binary=True,
                                 behaviors={"connect_timeout": int(configurations.MEMCACHED_CONNECTION_TIMEOUT * 1000),

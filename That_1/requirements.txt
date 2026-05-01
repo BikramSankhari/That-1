@@ -1,5 +1,6 @@
 aiomcache==0.8.2
 asgiref==3.8.1
+asyncpg==0.31.0
 bitarray==3.3.2
 bloompy==0.1.1
 Django==5.2
@@ -7,7 +8,9 @@ grpcio==1.71.0
 grpcio-tools==1.71.0
 mmh3==5.1.0
 protobuf==5.29.4
+psycopg2==2.9.12
 Pympler==1.1
+python-dotenv==1.2.2
 pywin32==310
 redis==6.2.0
 setuptools==79.0.1

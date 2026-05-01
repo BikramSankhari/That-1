@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from . import auth_pb2 as auth__pb2
+from Auth.proto.Auth import auth_pb2 as Auth_dot_proto_dot_Auth_dot_auth__pb2
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 GRPC_GENERATED_VERSION = '1.71.0'
@@ -19,7 +19,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in auth_pb2_grpc.py depends on'
+        + f' but the generated code in Auth/proto/Auth/auth_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -37,18 +37,18 @@ class AuthStub(object):
         """
         self.UniqueValidate = channel.unary_unary(
                 '/Auth.Auth/UniqueValidate',
-                request_serializer=auth__pb2.Email.SerializeToString,
-                response_deserializer=auth__pb2.IsValid.FromString,
+                request_serializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.Email.SerializeToString,
+                response_deserializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.IsValid.FromString,
                 _registered_method=True)
         self.Signup = channel.unary_unary(
                 '/Auth.Auth/Signup',
-                request_serializer=auth__pb2.SignupRequest.SerializeToString,
-                response_deserializer=auth__pb2.SignupResponse.FromString,
+                request_serializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.SignupRequest.SerializeToString,
+                response_deserializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.SignupResponse.FromString,
                 _registered_method=True)
         self.GetBloomFromPeer = channel.unary_unary(
                 '/Auth.Auth/GetBloomFromPeer',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=auth__pb2.BloomResponseFromPeer.FromString,
+                response_deserializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.BloomResponseFromPeer.FromString,
                 _registered_method=True)
 
 
@@ -78,18 +78,18 @@ def add_AuthServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'UniqueValidate': grpc.unary_unary_rpc_method_handler(
                     servicer.UniqueValidate,
-                    request_deserializer=auth__pb2.Email.FromString,
-                    response_serializer=auth__pb2.IsValid.SerializeToString,
+                    request_deserializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.Email.FromString,
+                    response_serializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.IsValid.SerializeToString,
             ),
             'Signup': grpc.unary_unary_rpc_method_handler(
                     servicer.Signup,
-                    request_deserializer=auth__pb2.SignupRequest.FromString,
-                    response_serializer=auth__pb2.SignupResponse.SerializeToString,
+                    request_deserializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.SignupRequest.FromString,
+                    response_serializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.SignupResponse.SerializeToString,
             ),
             'GetBloomFromPeer': grpc.unary_unary_rpc_method_handler(
                     servicer.GetBloomFromPeer,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=auth__pb2.BloomResponseFromPeer.SerializeToString,
+                    response_serializer=Auth_dot_proto_dot_Auth_dot_auth__pb2.BloomResponseFromPeer.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -117,8 +117,8 @@ class Auth(object):
             request,
             target,
             '/Auth.Auth/UniqueValidate',
-            auth__pb2.Email.SerializeToString,
-            auth__pb2.IsValid.FromString,
+            Auth_dot_proto_dot_Auth_dot_auth__pb2.Email.SerializeToString,
+            Auth_dot_proto_dot_Auth_dot_auth__pb2.IsValid.FromString,
             options,
             channel_credentials,
             insecure,
@@ -144,8 +144,8 @@ class Auth(object):
             request,
             target,
             '/Auth.Auth/Signup',
-            auth__pb2.SignupRequest.SerializeToString,
-            auth__pb2.SignupResponse.FromString,
+            Auth_dot_proto_dot_Auth_dot_auth__pb2.SignupRequest.SerializeToString,
+            Auth_dot_proto_dot_Auth_dot_auth__pb2.SignupResponse.FromString,
             options,
             channel_credentials,
             insecure,
@@ -172,7 +172,7 @@ class Auth(object):
             target,
             '/Auth.Auth/GetBloomFromPeer',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            auth__pb2.BloomResponseFromPeer.FromString,
+            Auth_dot_proto_dot_Auth_dot_auth__pb2.BloomResponseFromPeer.FromString,
             options,
             channel_credentials,
             insecure,

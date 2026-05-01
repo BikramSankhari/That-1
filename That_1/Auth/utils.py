@@ -21,7 +21,7 @@ GRPC_EXCEPTIONS = (
 )
 
 
-async_memcached = AsyncMemcache(unix_socket=os.environ.get("MEMCACHED_UNIX_SOCKET"),
+async_memcached = AsyncMemcache.Client(unix_socket=os.environ.get("MEMCACHED_UNIX_SOCKET"),
                                 connection_timeout=configurations.MEMCACHED_CONNECTION_TIMEOUT, timeout=configurations.SYNC_MEMCACHED_TIMEOUT,
                                 pool_size=configurations.MEMCACHED_POOL_SIZE,
                                 exceptions=MEMCACHED_EXCEPTIONS,
