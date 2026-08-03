@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infinity-deployment
+  labels:
+    app: infinity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: infinity
+  template:
+    metadata:
+      labels:
+        app: infinity
+    spec:
+      containers:
+      - name: infinity
+        image: sankhari/that1:infinity
+
+        volumeMounts:
+        - name: secret-vol
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      
+      volumes:
+      - name: secret-vol
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: demo-secret-provider

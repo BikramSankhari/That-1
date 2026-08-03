@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from . import Configurations
 from dotenv import load_dotenv
+import sys
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -119,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -140,3 +141,87 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Auth.User'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = os.environ.get('HOST_EMAIL')
+EMAIL_HOST_PASSWORD = os.environ.get('HOST_EMAIL_PASSWORD')
+
+SERVER_EMAIL = os.environ.get('HOST_EMAIL')
+DEFAULT_FROM_EMAIL = os.environ.get('HOST_EMAIL')
+
+ADMINS = [
+    ("Bikram", "bikram1209@gmail.com"),
+]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "json": {
+            "format": (
+                '{{'
+                '"time":"{asctime}",'
+                '"level":"{levelname}",'
+                '"logger":"{name}",'
+                '"module":"{module}",'
+                '"line":{lineno},'
+                '"process":{process}",'
+                '"thread":{thread}",'
+                '"message":"{message}"'
+                '}}'
+            ),
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+
+        # stdout
+        "console": {
+            "class": "logging.StreamHandler",
+            "stream": sys.stdout,
+            "formatter": "json",
+            "level": "INFO",
+        },
+
+        # stderr for errors
+        "error_console": {
+            "class": "logging.StreamHandler",
+            "stream": sys.stderr,
+            "formatter": "json",
+            "level": "ERROR",
+        },
+
+        # mail admin for critical errors
+        "mail_admins": {
+            "level": "CRITICAL",
+            "class": "django.utils.log.AdminEmailHandler",
+            "include_html": True,
+        },
+    },
+
+    "root": {
+        "handlers": ["console", "error_console", "mail_admins"],
+        "level": "INFO",
+    },
+
+    "loggers": {
+        "django": {
+            "handlers": ["console", "error_console", "mail_admins"],
+            "level": "INFO",
+            "propagate": False,
+        },
+
+        "Auth": {
+            "handlers": ["console", "error_console", "mail_admins"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

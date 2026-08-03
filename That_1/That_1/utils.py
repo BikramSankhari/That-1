@@ -10,15 +10,27 @@ from .Configurations import BASE_BACKOFF, MAX_RETRIES
 Exponentially retries max_retries time, after getting exception in first attempt and finally raises the exception.
  e.g. if max_retries=2 then will try total 3 times (1 original + 2 retries)
 '''
-def exponential_backoff_retry(base_backoff=BASE_BACKOFF, max_retries=MAX_RETRIES, exceptions=(Exception,), is_async=False):
+
+
+def exponential_backoff_retry(base_backoff=BASE_BACKOFF,
+                              max_retries=MAX_RETRIES, exceptions=(Exception,),
+                              is_async=False,
+                              logger=None,
+                              log_level="ERROR"):
     def decorator(func):
         def retry_logic(retries, exception):
             if retries > max_retries:
                 raise exception
             wait_time = base_backoff * (2 ** (retries - 1))
             jitter = random.uniform(0, wait_time)  # Full Jitter
-            print(
-                f"Retrying \"{func.__name__}\" due to \"{exception}\". Retry \"{retries}/{max_retries}\". Waiting for \"{jitter:.2f}\" seconds before next attempt.")
+
+            log_string = f"Retrying \"{func.__name__}\" due to \"{exception}\". Retry \"{retries}/{max_retries}\". Waiting for \"{jitter:.2f}\" seconds before next attempt."
+
+            if logger:
+                getattr(logger, log_level.lower())(log_string)
+            else:
+                print(log_string)
+
             return jitter
 
         # For Synchronous functions

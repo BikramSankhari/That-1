@@ -4,11 +4,12 @@ from . import configurations
 import os
 import socket
 import grpc
-import zstd
+import zstandard
+import logging
 
 MEMCACHED_EXCEPTIONS = (ResponseTimeOut, ConnectionTimeout, socket.error)
 
-DECOMPRESSION_EXCEPTIONS = (zstd.Error,)
+DECOMPRESSION_EXCEPTIONS = (zstandard.ZstdError,)
 
 GRPC_EXCEPTIONS = (
     grpc.RpcError,
@@ -20,10 +21,14 @@ GRPC_EXCEPTIONS = (
     OSError
 )
 
-
 async_memcached = AsyncMemcache.Client(unix_socket=os.environ.get("MEMCACHED_UNIX_SOCKET"),
                                 connection_timeout=configurations.MEMCACHED_CONNECTION_TIMEOUT, timeout=configurations.SYNC_MEMCACHED_TIMEOUT,
                                 pool_size=configurations.MEMCACHED_POOL_SIZE,
                                 exceptions=MEMCACHED_EXCEPTIONS,
                                 base_backoff=configurations.BASE_MEMCACHED_BACKOFF,
                                 max_retries=configurations.MAX_MEMCACHED_RETRIES)
+
+logger = logging.getLogger("Auth")
+
+POD_NAME = os.environ.get("POD_NAME")
+NODE_NAME = os.environ.get("NODE_NAME")

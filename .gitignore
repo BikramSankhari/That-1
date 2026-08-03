@@ -5,6 +5,8 @@ logo.docx
 temp.py
 commands.md
 secrets/
+my-key-pair.pem
+private.key
 
 # Django stuff:
 *.log

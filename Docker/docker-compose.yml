@@ -1,0 +1,20 @@
+services:
+  k3s:
+    container_name: k3s
+    build:
+      context: ./K3s_Img
+      dockerfile: ./Dockerfile
+    privileged: true
+
+    volumes:
+      - ./:/var/lib/kubelet:rshared
+  
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    depends_on:
+      - k3s
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Nginx/nginx.conf:/etc/nginx/nginx.conf:ro
