@@ -1,9 +1,9 @@
 #!/bin/bash
 
-scp -i my-key-pair.pem Docker/K3s_Img/private.key ec2-user@44.211.95.137:~
-scp -i my-key-pair.pem Docker/K3s_Img/public.pub ec2-user@44.211.95.137:~
+scp -i my-key-pair.pem Docker/K3s_Img/private.key ec2-user@35.172.116.245:~
+scp -i my-key-pair.pem Docker/K3s_Img/public.pub ec2-user@35.172.116.245:~
 
-ssh -i my-key-pair.pem ec2-user@44.211.95.137
+ssh -i my-key-pair.pem ec2-user@35.172.116.245
 
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server \
   --write-kubeconfig-mode 644 \
@@ -16,3 +16,4 @@ kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/he
 kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/oidc-jwks-configmap.yaml
 kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/oidc-nginx-config.yaml
 kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/oidc-nginx-deployment.yaml
+kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/oidc-nginx-service.yaml
