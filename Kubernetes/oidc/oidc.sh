@@ -22,3 +22,11 @@ kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/he
 sudo yum install git make -y
 
 git clone https://github.com/aws/amazon-eks-pod-identity-webhook.git
+
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.21.1/cert-manager.yaml
+make cluster-up IMAGE=amazon/amazon-eks-pod-identity-webhook:latest
+
+kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/test-pod.yaml
+
+# Add this line in the AWS Role's json
+# "oidc.sankhari.shop:sub": "system:serviceaccount:default:secrets-reader-sa"
