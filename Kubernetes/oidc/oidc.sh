@@ -17,7 +17,7 @@ kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/he
 kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/oidc-nginx-config.yaml
 kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/oidc-nginx-deployment.yaml
 kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/oidc-nginx-service.yaml
-kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/service-account.yaml
+kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/secretproviderclass.yaml
 
 sudo yum install git make -y
 
@@ -40,3 +40,4 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 helm repo add aws-secrets-manager https://aws.github.io/secrets-store-csi-driver-provider-aws
 helm install -n kube-system secrets-provider-aws aws-secrets-manager/secrets-store-csi-driver-provider-aws
 
+kubectl apply -f https://raw.githubusercontent.com/BikramSankhari/That-1/refs/heads/Auth_Backend/Kubernetes/oidc/secret-test-pod.yaml
